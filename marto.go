@@ -8,21 +8,17 @@ import (
 )
 
 type Marto struct {
-	client                 *http.Client
-	RequestStats           []*RequestStat
-	AggregatedRequestStats map[string]*AggregatedRequestStat
-	scenarios              map[string]*Scenario
-	pendingSessionCount    int
-	reporters              []Reporter
+	client              *http.Client
+	scenarios           map[string]*Scenario
+	pendingSessionCount int
+	reporters           []Reporter
 }
 
 func NewMarto() *Marto {
 	return &Marto{
-		client:                 &http.Client{},
-		RequestStats:           make([]*RequestStat, 0),
-		AggregatedRequestStats: map[string]*AggregatedRequestStat{},
-		scenarios:              map[string]*Scenario{},               
-		pendingSessionCount:    0,
+		client:              &http.Client{},
+		scenarios:           map[string]*Scenario{},               
+		pendingSessionCount: 0,
 	}
 }
 
@@ -43,7 +39,7 @@ var ch = make(chan *Session)
 func (m *Marto) Run() {
 	for _, scenario := range m.scenarios {
 		m.pendingSessionCount += scenario.RepeatCount()
-		m.RunScenario(scenario)
+		m.runScenario(scenario)
 	}
 
 	for {
@@ -58,9 +54,8 @@ func (m *Marto) Run() {
 
 }
 
-
 // run the scenario
-func (m *Marto) RunScenario(scenario *Scenario) {
+func (m *Marto) runScenario(scenario *Scenario) {
 	if !scenario.HasRequest() {
 		panic(fmt.Sprintf("No request found on scenario: %s", scenario.Id))	
 	}
@@ -70,23 +65,17 @@ func (m *Marto) RunScenario(scenario *Scenario) {
 	}
 
 	for i := 0; i < scenario.RepeatCount(); i++ {
-		m.startSession(scenario)
+		session := scenario.CreateSession()
+
+		for _, reporter := range m.reporters {
+			reporter.OnSessionStarted(session)
+		}
+
+		go func() {
+			m.processSession(session)
+		}()
 	}
 }
-
-
-func (m *Marto) startSession(scenario *Scenario) {
-	session := scenario.CreateSession()
-
-	for _, reporter := range m.reporters {
-		reporter.OnSessionStarted(session)
-	}
-
-	go func() {
-		m.processSession(session)
-	}()
-}
-
 
 // send current session request
 func (m *Marto) processSession(sess *Session) {
