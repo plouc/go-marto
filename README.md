@@ -48,16 +48,19 @@ func main() {
 
 ##Reporting
 
-The package provide a simple reporter accepting an io.Writer, it can be used to send reporting to stdout, file…
+###WriterReporter
+
+The package provide a simple reporter accepting an **io.Writer**, it can be used to send reporting to stdout, file…
+
 Note that you can add several reporters on a single Marto.
 
-###a WriterReporter using stdout
+####a WriterReporter using stdout
 
 ````go
 m.AddReporter(marto.NewWriterReporter(os.Stdout))
 ````
 
-###a WriterReporter using a file 
+####a WriterReporter using a file 
 
 ````go
 fo, err := os.Create("marto.log")
@@ -70,7 +73,15 @@ defer func() {
 m.AddReporter(marto.NewWriterReporter(fo))
 ````
 
-###customize
+###AggregatorReporter
+
+The **AggregatorReporter** automatically store the number of request iterations and compute the average duration.
+
+````go
+m.AddReporter(marto.NewAggregatorReporter())
+````
+
+###Customize
 
 You can easily add **custom reporters**, you just have to conform to the **Reporter interface**:
 
