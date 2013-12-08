@@ -18,6 +18,11 @@ type AggregatedRequestStat struct {
 	Count           int64
 	Total           int64
 	AverageDuration int64
+	StatusCodes     map[int]uint64
+}
+
+func NewRequestStat(method string, url string, startedAt time.Time) *RequestStat {
+	return &RequestStat{url, method, startedAt, 0, 0}
 }
 
 func (rs *RequestStat) Finished() {

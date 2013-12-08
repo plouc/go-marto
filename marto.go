@@ -3,7 +3,6 @@ package marto
 import (
 	"fmt"
 	"net/http"
-	//"io/ioutil"
 	"log"
 	"time"
 )
@@ -55,12 +54,14 @@ func (m *Marto) AggregateRequestStats() {
 				Count:           0,
 				Total:           0,
 				AverageDuration: 0,
+				StatusCodes:     map[int]uint64{},
 			}
 		}
 
 		m.AggregatedRequestStats[statKey].Count++
 		m.AggregatedRequestStats[statKey].Total += reqStat.Duration.Nanoseconds()
 		m.AggregatedRequestStats[statKey].AverageDuration = m.AggregatedRequestStats[statKey].Total / m.AggregatedRequestStats[statKey].Count
+		m.AggregatedRequestStats[statKey].StatusCodes[reqStat.StatusCode]++
 	}
 }
 
@@ -91,37 +92,38 @@ func (m *Marto) Start(id string) {
 	fmt.Println("finished scenario", id)
 }
 
+// send current session request
 func (m *Marto) processSession(s *Session) {
 	if !s.HasFinished() {
 		req := s.CurrentRequest()
-
 		if req.HasDelay() {
 			fmt.Printf("...delaying execution of %s %s for %dms...\n", req.Method, req.URL.String(), req.Delay())
 			select {
         	case <-time.After(time.Duration(req.Delay() * uint64(time.Millisecond))):
-        		m.doRequest(req)
-				s.Next()
-				m.processSession(s)
+        		m.processSessionRequest(s)
         	}
 		} else {
-			m.doRequest(req)
-			s.Next()
-			m.processSession(s)
+			m.processSessionRequest(s)
 		}
 	}
 }
 
+// send current session request and try to process next request
+func (m *Marto) processSessionRequest(s *Session) {
+	req := s.CurrentRequest()
+	m.doRequest(req)
+	s.Next()
+	m.processSession(s)
+}
+
+// send a request
 func (m *Marto) doRequest(req *Request) *http.Response {
 
-	reqStat := &RequestStat{
-		Url:       req.URL.String(),
-		Method:    req.Method,
-		StartedAt: time.Now(),
-	}
+	reqStat := NewRequestStat(req.Method, req.URL.String(), time.Now())
 
 	m.RequestStats = append(m.RequestStats, reqStat)
 
-	fmt.Printf("-> request.start - %s [%d]\n", req.URL.String(), len(m.RequestStats))
+	fmt.Printf("> request.start - %s [%d]\n", req.URL.String(), len(m.RequestStats))
 
 	defer reqStat.Finished()
 
@@ -132,7 +134,7 @@ func (m *Marto) doRequest(req *Request) *http.Response {
 
 	reqStat.StatusCode = res.StatusCode
 
-	fmt.Printf("   request.end [%d]\n", res.StatusCode)
+	fmt.Printf("  request.end [%d]\n", res.StatusCode)
 
 	return res
 }
