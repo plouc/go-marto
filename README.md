@@ -43,7 +43,7 @@ func main() {
 
 ##Building scenarios
 
-A **Scenario** contains a suite of **Requests**, it is used to create a **Session**, finally **Requests** from the **Scenario** aren't directly used to make http calls, instead, thoses **Requests** are copied into a new **Session** and **Requests**. You can think of the **scenario** as a Template, a **Session** is an instance of this template.
+A **Scenario** contains a suite of **Requests**, it is used to create a **Session**, finally **Requests** from the **Scenario** aren't directly used to make http calls, instead, thoses **Requests** are copied into a new **Session**. You can think of the **Scenario** as a Template and the **Session** as an instance of this template.
 
 The decoupling is usefull to distribute requests over time.
 
