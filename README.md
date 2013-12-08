@@ -120,10 +120,12 @@ m.AddReporter(marto.NewWriterReporter(fo))
 
 ###AggregatorReporter
 
-The **AggregatorReporter** automatically store the number of request iterations and compute the average duration.
+The **AggregatorReporter** automatically store the number of request iterations and compute the average duration plus an histogram of requests per second.
 
 ````go
 m.AddReporter(marto.NewAggregatorReporter())
+reporter.Dump(os.Stdout)
+reporter.DumpJson(os.Stdout)
 ````
 
 ###Customize
