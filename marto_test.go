@@ -28,6 +28,14 @@ func TestRun(t *testing.T) {
 	reports := reporter.Scenarios
 
 	assert.Equal(t, len(reports), 1, "reports contain one scenario")
-	_, ok := reports["test_0"]
+	report, ok := reports["test_0"]
 	assert.True(t, ok, "reports contain the given scenario")
+	assert.Equal(t, len(report.Stats), 1, "reports stats contain one request")
+	stats, ok := report.Stats["0"]
+	assert.True(t, ok, "report contain a request with the given key")
+	assert.IsType(t, new(RequestStats), stats)
+	assert.Equal(t, stats.Url, ts.URL)
+	assert.Equal(t, stats.Method, "GET")
+	assert.Equal(t, stats.Count, 1)
+	assert.Equal(t, len(report.Histogram), 1, "reports histogram contain one request")
 }
