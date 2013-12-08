@@ -32,5 +32,5 @@ func (r *WriterReporter) OnRequest(request *Request) {
 	fmt.Fprintf(r.Writer, "request | %s %s [step %d/%d]\n", request.Method, request.URL.String(), request.Id() + 1, request.Scenario.RequestCount())
 }
 func (r *WriterReporter) OnResponse(request *Request, response *http.Response) {
-	fmt.Fprintf(r.Writer, "response | %d | %s |%s %s\n", response.StatusCode, request.Elapsed, request.Method, request.URL.String())
+	fmt.Fprintf(r.Writer, "response | %d | %s | %s %s\n", response.StatusCode, request.Elapsed, request.Method, request.URL.String())
 }

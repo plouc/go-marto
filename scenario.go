@@ -8,6 +8,7 @@ type Scenario struct {
 	Id       string
 	requests []*Request
 	repeat   int
+	every    int
 	sessions []*Session
 }
 
@@ -16,6 +17,8 @@ func NewScenario(id string) *Scenario {
 		Id:       id,
 		requests: make([]*Request, 0),
 		repeat:   0,
+		every:    0,
+		sessions: make([]*Session, 0),
 	}
 }
 
@@ -35,8 +38,10 @@ func (s *Scenario) Requests() []*Request {
 	return s.requests
 }
 
-func (s *Scenario) Repeat(count int) {
+func (s *Scenario) Repeat(count int) *Scenario {
 	s.repeat = count
+
+	return s
 }
 
 func (s *Scenario) ShouldRepeat() bool {
@@ -45,6 +50,20 @@ func (s *Scenario) ShouldRepeat() bool {
 
 func (s *Scenario) RepeatCount() int {
 	return s.repeat
+}
+
+func (s *Scenario) Every(seconds int) *Scenario {
+	s.every = seconds
+
+	return s
+}
+
+func (s *Scenario) IsDelayed() bool {
+	return s.every > 0
+}
+
+func (s *Scenario) GetDelay() int {
+	return s.every
 }
 
 func (s *Scenario) RequestCount() int {

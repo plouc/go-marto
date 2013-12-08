@@ -15,7 +15,6 @@ type Request struct {
 	id        int
 
 	delay     uint64
-	duration  uint64
 
 	feeders   []Feeder
 
@@ -36,12 +35,15 @@ func NewRequest(id int, scenario *Scenario, method string, strUrl string, body i
 		Scenario:  scenario,
 		id:        id,
 		delay:     0,
-		duration:  0,
 		feeders:   make([]Feeder, 0),
 		StartedAt: time.Time{},
 		EndedAt:   time.Time{},
 		Elapsed:   time.Duration(0),
 	}, nil
+}
+
+func (r *Request) IsFirst() bool {
+	return r.id == 0
 }
 
 func (r *Request) Start() {
@@ -69,16 +71,6 @@ func (r *Request) SetDelay(delay uint64) *Request {
 
 func (r *Request) Delay() uint64 {
 	return r.delay
-}
-
-func (r *Request) SetIn(duration uint64) *Request {
-	r.duration = duration
-
-	return r
-}
-
-func (r *Request) In() uint64 {
-	return r.duration
 }
 
 func (r *Request) BindFeeder(f Feeder) {

@@ -87,10 +87,20 @@ func (m *Marto) StartScenarioSession(scenario *Scenario) {
 func (m *Marto) processSession(sess *Session) {
 	if !sess.HasFinished() {
 		req := sess.CurrentRequest()
+
+		delay := 0
 		if req.HasDelay() {
-			//fmt.Printf("...delaying execution of %s %s for %dms...\n", req.Method, req.URL.String(), req.Delay())
+			delay = int(req.Delay() * uint64(time.Millisecond))
+		}
+
+		if sess.Scenario.IsDelayed() && req.IsFirst() && sess.Id() > 0 {
+			delay += sess.Scenario.GetDelay() * int(time.Millisecond) * sess.Id()
+		}
+
+		if delay > 0 {
+			delay := time.Duration(delay)
 			select {
-        	case <-time.After(time.Duration(req.Delay() * uint64(time.Millisecond))):
+        	case <-time.After(delay):
         		ch <- m.processSessionRequest(sess)
         	}
 		} else {
