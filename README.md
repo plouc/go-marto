@@ -30,10 +30,9 @@ import (
 func main() {
 	marto := _marto.NewMarto()
 
-	scenario := _marto.NewScenario("search")
+	scenario := _marto.NewScenario("search").Repeat(2)
 	scenario.Append("GET", "http://google.com", nil)
 	scenario.Append("GET", "http://google.com/search?q=test", nil).SetDelay(2000)
-	scenario.Repeat(2)
 	marto.AddScenario(scenario)
 	
 	marto.AddReporter(_marto.NewWriterReporter(os.Stdout))
@@ -58,17 +57,15 @@ s.Append("GET", "http://google.com", nil)
 We've just created a basic Scenario composed of one GET request, but wait, if I want to make thousand of requests simultaneously, I have to create each Scenario manually ? No, you just have to make your scenario repeatable:
 
 ````go
-s := marto.NewScenario("search")
+s := marto.NewScenario("search").Repeat(100)
 s.Append("GET", "http://google.com", nil)
-s.Repeat(100)
 ````
 
 You will now spawn 100 requests simultaneously, but having those all spawned at the same time can be weird, you should distribute them among time, to make the tool behave in a more natural way, launching the first session, waiting 100ms, launching the second session and so on…:
 
 ````go
-s := marto.NewScenario("search")
+s := marto.NewScenario("search").Repeat(100).Every(100)
 s.Append("GET", "http://google.com", nil)
-s.Repeat(100).Every(100)
 ````
 
 Now you will spawn a request every 100ms until the desired count.
@@ -76,19 +73,17 @@ Now you will spawn a request every 100ms until the desired count.
 Consider this other example:
 
 ````go
-s := marto.NewScenario("search")
+s := marto.NewScenario("search").Repeat(100).Every(100)
 s.Append("GET", "http://google.com", nil)
 s.Append("GET", "http://google.com/search?q=test", nil)
-s.Repeat(100).Every(100)
 ````
 
 The first session will start at 0ms, the second one at 100ms, the third at 200ms… but the two requests of the scenario will again spawn simultaneously, to change this you can alter the **Request** sent back when you call "s.Append()" to make it wait for a given time:
 
 ````go
-s := marto.NewScenario("search")
+s := marto.NewScenario("search").Repeat(100).Every(100)
 s.Append("GET", "http://google.com", nil)
 s.Append("GET", "http://google.com/search?q=test", nil).SetDelay(2000)
-s.Repeat(100).Every(100)
 ````
 
 Now the first session will start at 0ms, the first request of this session will also start at 0ms, the second request will start at 2000ms, the second session will start at 100ms, the first request of the second session will start at 100ms and the second one at 2100ms (the value passed to Every() * the position of the session + the delay set on the request)…
