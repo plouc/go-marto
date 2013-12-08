@@ -22,22 +22,22 @@ package main
 
 import (
 	"os"
-	"github.com/plouc/go-marto"
+	_marto "github.com/plouc/go-marto"
 )
 
 func main() {
-	m := marto.NewMarto()
+	marto := _marto.NewMarto()
 
-	s := marto.NewScenario("search")
-	s.Append("GET", "http://google.com", nil)
-	req := s.Append("GET", "http://google.com/search?q=test", nil)
-	req.SetDelay(2000)
-	s.Repeat(2)
-	m.AddScenario(s)
+	scenario := _marto.NewScenario("search")
+	scenario.Append("GET", "http://google.com", nil)
+	request := scenario.Append("GET", "http://google.com/search?q=test", nil)
+	request.SetDelay(2000)
+	scenario.Repeat(2)
+	marto.AddScenario(scenario)
 	
-	m.AddReporter(marto.NewWriterReporter(os.Stdout))
+	marto.AddReporter(_marto.NewWriterReporter(os.Stdout))
 
-	m.Run()
+	marto.Run()
 }
 ````
 
