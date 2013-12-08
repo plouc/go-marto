@@ -28,16 +28,18 @@ func NewMarto() *Marto {
 	}
 }
 
+// AddReporter add a new reporter to the list of reporters.
+// You should use the WriterReporter for example.
 func (m *Marto) AddReporter(reporter Reporter) {
 	m.reporters = append(m.reporters, reporter)
 }
 
-
+// AddScenario add a new scenario to the list of scenarios.
 func (m *Marto) AddScenario(scenario *Scenario) {
 	m.scenarios[scenario.Id] = scenario
 }
 
-// run all scenarios
+// Run all available scenarios.
 func (m *Marto) Run() {
 	for _, scenario := range m.scenarios {
 		m.RunScenario(scenario)
