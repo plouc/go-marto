@@ -1,17 +1,25 @@
 package marto
 
 type Session struct {
+	id       int // private because it must be set according to scenario.Sessions size
 	current  int
 	requests []*Request
 	finished bool
+	Scenario *Scenario
 }
 
-func NewSession(requests []*Request) *Session {
+func NewSession(scenario *Scenario) *Session {
 	return &Session{
+		id:       len(scenario.Sessions()),
 		current:  0,
-		requests: requests,
+		Scenario: scenario,
+		requests: scenario.Requests(),
 		finished: false,
 	}
+}
+
+func (s *Session) Id() int {
+	return s.id
 }
 
 func (s *Session) CurrentRequest() *Request {

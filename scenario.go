@@ -5,24 +5,34 @@ import (
 )
 
 type Scenario struct {
+	Id       string
 	requests []*Request
 	repeat   int
 	sessions []*Session
 }
 
-func NewScenario() *Scenario {
+func NewScenario(id string) *Scenario {
 	return &Scenario {
+		Id:       id,
 		requests: make([]*Request, 0),
 		repeat:   0,
 	}
 }
 
 func (s *Scenario) CreateSession() *Session {
-	session := NewSession(s.requests)
+	session := NewSession(s)
 
 	s.sessions = append(s.sessions, session)
 
 	return session
+}
+
+func (s *Scenario) Sessions() []*Session {
+	return s.sessions
+}
+
+func (s *Scenario) Requests() []*Request {
+	return s.requests
 }
 
 func (s *Scenario) Repeat(count int) {
@@ -37,16 +47,19 @@ func (s *Scenario) RepeatCount() int {
 	return s.repeat
 }
 
-func (s *Scenario) AppendRequest(req *Request) {
-	s.requests = append(s.requests, req)
+func (s *Scenario) RequestCount() int {
+	return len(s.requests)
 }
 
-func (s *Scenario) AppendRequestFromConfig(method string, strUrl string, body io.Reader, delay uint64) {
-	req, err := NewRequest(method, strUrl, body, delay)
+func (s *Scenario) Append(method string, strUrl string, body io.Reader) *Request {
+	req, err := NewRequest(s.RequestCount(), s, method, strUrl, body)
     if err != nil {
     	panic(err)
     }
-    s.AppendRequest(req)
+
+    s.requests = append(s.requests, req)
+
+    return req
 }
 
 func (s *Scenario) HasRequest() bool {

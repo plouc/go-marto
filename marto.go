@@ -7,21 +7,20 @@ import (
 	"time"
 )
 
+var ch = make(chan *Session)
+
 type Marto struct {
 	client                 *http.Client
 	RequestStats           []*RequestStat
 	AggregatedRequestStats map[string]*AggregatedRequestStat
 	scenarios              map[string]*Scenario
 	runningScenarios       []string
+	reporters              []Reporter
 }
 
 func NewMarto() *Marto {
-
-	client := &http.Client{
-	}
-
 	return &Marto{
-		client:                 client,
+		client:                 &http.Client{},
 		RequestStats:           make([]*RequestStat, 0),
 		AggregatedRequestStats: map[string]*AggregatedRequestStat{},
 		scenarios:              map[string]*Scenario{},               
@@ -29,112 +28,101 @@ func NewMarto() *Marto {
 	}
 }
 
-func (m *Marto) AddScenario(id string, s *Scenario) {
-	m.scenarios[id] = s
+func (m *Marto) AddReporter(reporter Reporter) {
+	m.reporters = append(m.reporters, reporter)
 }
 
-func (m *Marto) IsRunningScenario(id string) bool {
-    for _, runningId := range m.runningScenarios {
-        if id == runningId {
-            return true
-        }
-    }
-    return false
+
+func (m *Marto) AddScenario(scenario *Scenario) {
+	m.scenarios[scenario.Id] = scenario
 }
 
-func (m *Marto) AggregateRequestStats() {
-	for _, reqStat := range m.RequestStats {
-		
-		statKey := reqStat.Method + reqStat.Url
+// run all scenarios
+func (m *Marto) Run() {
+	for _, scenario := range m.scenarios {
+		m.RunScenario(scenario)
+	}
 
-		if _, ok := m.AggregatedRequestStats[statKey]; !ok {
-			m.AggregatedRequestStats[statKey] = &AggregatedRequestStat{
-				Method:          reqStat.Method,
-				Url:             reqStat.Url,
-				Count:           0,
-				Total:           0,
-				AverageDuration: 0,
-				StatusCodes:     map[int]uint64{},
-			}
+	for {
+		select {
+		case _ = <-ch:
 		}
-
-		m.AggregatedRequestStats[statKey].Count++
-		m.AggregatedRequestStats[statKey].Total += reqStat.Duration.Nanoseconds()
-		m.AggregatedRequestStats[statKey].AverageDuration = m.AggregatedRequestStats[statKey].Total / m.AggregatedRequestStats[statKey].Count
-		m.AggregatedRequestStats[statKey].StatusCodes[reqStat.StatusCode]++
 	}
 }
 
-func (m *Marto) Start(id string) {
 
-	fmt.Println("starting scenario", id)
-
-	if _, ok := m.scenarios[id]; !ok {
-		panic(fmt.Sprintf("No scenario defined for id: %s", id))
-	}
-
-	scenario := m.scenarios[id]
-
+// run the scenario
+func (m *Marto) RunScenario(scenario *Scenario) {
 	if !scenario.HasRequest() {
-		panic(fmt.Sprintf("No request found on scenario: %s", id))	
+		panic(fmt.Sprintf("No request found on scenario: %s", scenario.Id))	
 	}
 
-	session := scenario.CreateSession()
-	m.processSession(session)
+	for _, reporter := range m.reporters {
+		reporter.OnScenarioStarted(scenario)
+	}
 
+	m.StartScenarioSession(scenario)
 	if scenario.ShouldRepeat() {
 		for i := 1; i < scenario.RepeatCount(); i++ {
-			session = scenario.CreateSession()
-			m.processSession(session)
+			m.StartScenarioSession(scenario)
 		}
 	}
-
-	fmt.Println("finished scenario", id)
 }
+
+
+func (m *Marto) StartScenarioSession(scenario *Scenario) {
+	session := scenario.CreateSession()
+
+	for _, reporter := range m.reporters {
+		reporter.OnSessionStarted(session)
+	}
+
+	go func() {
+		m.processSession(session)
+	}()
+}
+
 
 // send current session request
 func (m *Marto) processSession(s *Session) {
 	if !s.HasFinished() {
 		req := s.CurrentRequest()
 		if req.HasDelay() {
-			fmt.Printf("...delaying execution of %s %s for %dms...\n", req.Method, req.URL.String(), req.Delay())
+			//fmt.Printf("...delaying execution of %s %s for %dms...\n", req.Method, req.URL.String(), req.Delay())
 			select {
         	case <-time.After(time.Duration(req.Delay() * uint64(time.Millisecond))):
-        		m.processSessionRequest(s)
+        		ch <- m.processSessionRequest(s)
         	}
 		} else {
-			m.processSessionRequest(s)
+			ch <- m.processSessionRequest(s)
 		}
 	}
 }
 
 // send current session request and try to process next request
-func (m *Marto) processSessionRequest(s *Session) {
+func (m *Marto) processSessionRequest(s *Session) *Session {
 	req := s.CurrentRequest()
+	req.Resolve()
 	m.doRequest(req)
 	s.Next()
 	m.processSession(s)
+
+	return s
 }
 
 // send a request
 func (m *Marto) doRequest(req *Request) *http.Response {
 
-	reqStat := NewRequestStat(req.Method, req.URL.String(), time.Now())
+	for _, reporter := range m.reporters { reporter.OnRequest(req) }
 
-	m.RequestStats = append(m.RequestStats, reqStat)
-
-	fmt.Printf("> request.start - %s [%d]\n", req.URL.String(), len(m.RequestStats))
-
-	defer reqStat.Finished()
+	//defer reqStat.Finished()
 
 	res, err := m.client.Do(req.Request)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	reqStat.StatusCode = res.StatusCode
-
-	fmt.Printf("  request.end [%d]\n", res.StatusCode)
+	for _, reporter := range m.reporters { reporter.OnResponse(res) }
 
 	return res
 }
