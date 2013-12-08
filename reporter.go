@@ -3,6 +3,8 @@ package marto
 import (
 	"fmt"
 	"net/http"
+	"io"
+	//"time"
 )
 
 type Reporter interface {
@@ -13,29 +15,34 @@ type Reporter interface {
 	OnSessionFinished(session *Session)
 
 	OnRequest(request *Request)
-	OnResponse(response *http.Response)
+	OnResponse(request *Request, response *http.Response)
 }
 
-type SimpleReporter struct {
+type WriterReporter struct {
+	Writer io.Writer
 }
 
-func (sr *SimpleReporter) OnScenarioStarted(scenario *Scenario) {
+func NewWriterReporter(writer io.Writer) *WriterReporter {
+	return &WriterReporter{writer}
+}
+
+func (wr *WriterReporter) OnScenarioStarted(scenario *Scenario) {
 	fmt.Printf("scenario.started | %s\n", scenario.Id)
 }
-func (sr *SimpleReporter) OnScenarioFinished(scenario *Scenario) {
+func (wr *WriterReporter) OnScenarioFinished(scenario *Scenario) {
 	fmt.Printf("scenario.finished | %s\n", scenario.Id)
 }
 
-func (sr *SimpleReporter) OnSessionStarted(session *Session) {
+func (wr *WriterReporter) OnSessionStarted(session *Session) {
 	fmt.Printf("session.started | scenario \"%s\" [%d/%d]\n", session.Scenario.Id, session.Id() + 1, session.Scenario.RepeatCount())
 }
-func (sr *SimpleReporter) OnSessionFinished(session *Session) {
+func (wr *WriterReporter) OnSessionFinished(session *Session) {
 	fmt.Println("session.finished")
 }
 
-func (sr *SimpleReporter) OnRequest(request *Request) {
+func (wr *WriterReporter) OnRequest(request *Request) {
 	fmt.Printf("request | %s %s [step %d/%d]\n", request.Method, request.URL.String(), request.Id() + 1, request.Scenario.RequestCount())
 }
-func (sr *SimpleReporter) OnResponse(response *http.Response) {
-	fmt.Printf("response | %d | %s %s\n", response.StatusCode, response.Request.Method, response.Request.URL.String())
+func (wr *WriterReporter) OnResponse(request *Request, response *http.Response) {
+	fmt.Printf("response | %d | %s |%s %s\n", response.StatusCode, request.Elapsed, request.Method, request.URL.String())
 }

@@ -84,17 +84,17 @@ func (m *Marto) StartScenarioSession(scenario *Scenario) {
 
 
 // send current session request
-func (m *Marto) processSession(s *Session) {
-	if !s.HasFinished() {
-		req := s.CurrentRequest()
+func (m *Marto) processSession(sess *Session) {
+	if !sess.HasFinished() {
+		req := sess.CurrentRequest()
 		if req.HasDelay() {
 			//fmt.Printf("...delaying execution of %s %s for %dms...\n", req.Method, req.URL.String(), req.Delay())
 			select {
         	case <-time.After(time.Duration(req.Delay() * uint64(time.Millisecond))):
-        		ch <- m.processSessionRequest(s)
+        		ch <- m.processSessionRequest(sess)
         	}
 		} else {
-			ch <- m.processSessionRequest(s)
+			ch <- m.processSessionRequest(sess)
 		}
 	}
 }
@@ -111,18 +111,19 @@ func (m *Marto) processSessionRequest(s *Session) *Session {
 }
 
 // send a request
-func (m *Marto) doRequest(req *Request) *http.Response {
+func (m *Marto) doRequest(req *Request) {
 
 	for _, reporter := range m.reporters { reporter.OnRequest(req) }
 
-	//defer reqStat.Finished()
+	req.Start()
+	//defer req.End()
 
 	res, err := m.client.Do(req.Request)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	for _, reporter := range m.reporters { reporter.OnResponse(res) }
+	req.End()
 
-	return res
+	for _, reporter := range m.reporters { reporter.OnResponse(req, res) }
 }

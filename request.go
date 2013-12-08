@@ -3,6 +3,7 @@ package marto
 import (
 	"net/http"
 	"io"
+	"time"
 	//"fmt"
 )
 
@@ -11,10 +12,16 @@ type Request struct {
 
 	Scenario *Scenario
 
-	id       int
-	delay    uint64
-	duration uint64
-	feeders  []Feeder
+	id        int
+
+	delay     uint64
+	duration  uint64
+
+	feeders   []Feeder
+
+	StartedAt time.Time
+	EndedAt   time.Time
+	Elapsed   time.Duration
 }
 
 func NewRequest(id int, scenario *Scenario, method string, strUrl string, body io.Reader) (*Request, error) {
@@ -24,7 +31,26 @@ func NewRequest(id int, scenario *Scenario, method string, strUrl string, body i
 		return nil, err
 	}
 
-	return &Request{req, scenario, id, 0, 0, make([]Feeder, 0)}, nil
+	return &Request{
+		Request:   req,
+		Scenario:  scenario,
+		id:        id,
+		delay:     0,
+		duration:  0,
+		feeders:   make([]Feeder, 0),
+		StartedAt: time.Time{},
+		EndedAt:   time.Time{},
+		Elapsed:   time.Duration(0),
+	}, nil
+}
+
+func (r *Request) Start() {
+	r.StartedAt = time.Now()
+}
+
+func (r *Request) End() {
+	r.EndedAt = time.Now()
+	r.Elapsed = time.Since(r.StartedAt)
 }
 
 func (r *Request) Id() int {
