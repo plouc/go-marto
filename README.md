@@ -1,7 +1,7 @@
 go-marto
 ========
 
-go-marto is an htpp stress tool written in golang.
+go-marto is an http stress tool written in golang.
 
 ##Installation
 
