@@ -30,8 +30,7 @@ func main() {
 
 	scenario := _marto.NewScenario("search")
 	scenario.Append("GET", "http://google.com", nil)
-	request := scenario.Append("GET", "http://google.com/search?q=test", nil)
-	request.SetDelay(2000)
+	scenario.Append("GET", "http://google.com/search?q=test", nil).SetDelay(2000)
 	scenario.Repeat(2)
 	marto.AddScenario(scenario)
 	
@@ -86,8 +85,7 @@ The first session will start at 0ms, the second one at 100ms, the third at 200ms
 ````go
 s := marto.NewScenario("search")
 s.Append("GET", "http://google.com", nil)
-req := s.Append("GET", "http://google.com/search?q=test", nil)
-req.SetDelay(2000)
+s.Append("GET", "http://google.com/search?q=test", nil).SetDelay(2000)
 s.Repeat(100).Every(100)
 ````
 

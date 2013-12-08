@@ -16,7 +16,7 @@ func NewScenario(id string) *Scenario {
 	return &Scenario {
 		Id:       id,
 		requests: make([]*Request, 0),
-		repeat:   0,
+		repeat:   1,
 		every:    0,
 		sessions: make([]*Session, 0),
 	}
@@ -39,6 +39,10 @@ func (s *Scenario) Requests() []*Request {
 }
 
 func (s *Scenario) Repeat(count int) *Scenario {
+	if count < 1 {
+		panic("You must repeat at least one time")
+	}
+	
 	s.repeat = count
 
 	return s

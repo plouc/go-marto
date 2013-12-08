@@ -22,18 +22,19 @@ func (s *Session) Id() int {
 	return s.id
 }
 
-func (s *Session) CurrentRequest() *Request {
-	return s.requests[s.current]
-}
+func (s *Session) ConsumeRequest() *Request {
+	req := s.requests[s.current]
+	req.Session = s
 
-func (s *Session) HasFinished() bool {
-	return s.finished
-}
-
-func (s *Session) Next() {
 	if s.current < (len(s.requests) - 1) {
 		s.current++
 	} else {
 		s.finished = true
 	}
+
+	return req
+}
+
+func (s *Session) HasFinished() bool {
+	return s.finished
 }

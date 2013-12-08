@@ -7,14 +7,12 @@ import (
 	"time"
 )
 
-var ch = make(chan *Session)
-
 type Marto struct {
 	client                 *http.Client
 	RequestStats           []*RequestStat
 	AggregatedRequestStats map[string]*AggregatedRequestStat
 	scenarios              map[string]*Scenario
-	runningScenarios       []string
+	pendingSessionCount    int
 	reporters              []Reporter
 }
 
@@ -24,7 +22,7 @@ func NewMarto() *Marto {
 		RequestStats:           make([]*RequestStat, 0),
 		AggregatedRequestStats: map[string]*AggregatedRequestStat{},
 		scenarios:              map[string]*Scenario{},               
-		runningScenarios:       make([]string, 0),
+		pendingSessionCount:    0,
 	}
 }
 
@@ -39,17 +37,25 @@ func (m *Marto) AddScenario(scenario *Scenario) {
 	m.scenarios[scenario.Id] = scenario
 }
 
+var ch = make(chan *Session)
+
 // Run all available scenarios.
 func (m *Marto) Run() {
 	for _, scenario := range m.scenarios {
+		m.pendingSessionCount += scenario.RepeatCount()
 		m.RunScenario(scenario)
 	}
 
 	for {
 		select {
 		case _ = <-ch:
+			m.pendingSessionCount--
+			if m.pendingSessionCount == 0 {
+				return
+			}
 		}
 	}
+
 }
 
 
@@ -63,16 +69,13 @@ func (m *Marto) RunScenario(scenario *Scenario) {
 		reporter.OnScenarioStarted(scenario)
 	}
 
-	m.StartScenarioSession(scenario)
-	if scenario.ShouldRepeat() {
-		for i := 1; i < scenario.RepeatCount(); i++ {
-			m.StartScenarioSession(scenario)
-		}
+	for i := 0; i < scenario.RepeatCount(); i++ {
+		m.startSession(scenario)
 	}
 }
 
 
-func (m *Marto) StartScenarioSession(scenario *Scenario) {
+func (m *Marto) startSession(scenario *Scenario) {
 	session := scenario.CreateSession()
 
 	for _, reporter := range m.reporters {
@@ -88,38 +91,20 @@ func (m *Marto) StartScenarioSession(scenario *Scenario) {
 // send current session request
 func (m *Marto) processSession(sess *Session) {
 	if !sess.HasFinished() {
-		req := sess.CurrentRequest()
-
-		delay := 0
-		if req.HasDelay() {
-			delay = int(req.Delay() * uint64(time.Millisecond))
-		}
-
-		if sess.Scenario.IsDelayed() && req.IsFirst() && sess.Id() > 0 {
+		req := sess.ConsumeRequest()
+		
+		delay := int(req.Delay() * uint64(time.Millisecond))
+		if req.IsFirst() {
 			delay += sess.Scenario.GetDelay() * int(time.Millisecond) * sess.Id()
 		}
 
-		if delay > 0 {
-			delay := time.Duration(delay)
-			select {
-        	case <-time.After(delay):
-        		ch <- m.processSessionRequest(sess)
-        	}
-		} else {
-			ch <- m.processSessionRequest(sess)
-		}
+		select {
+        case <-time.After(time.Duration(delay)):
+        	m.doRequest(req)
+        }
+	} else {
+		ch <- sess
 	}
-}
-
-// send current session request and try to process next request
-func (m *Marto) processSessionRequest(s *Session) *Session {
-	req := s.CurrentRequest()
-	req.Resolve()
-	m.doRequest(req)
-	s.Next()
-	m.processSession(s)
-
-	return s
 }
 
 // send a request
@@ -128,7 +113,6 @@ func (m *Marto) doRequest(req *Request) {
 	for _, reporter := range m.reporters { reporter.OnRequest(req) }
 
 	req.Start()
-	//defer req.End()
 
 	res, err := m.client.Do(req.Request)
 	if err != nil {
@@ -138,4 +122,6 @@ func (m *Marto) doRequest(req *Request) {
 	req.End()
 
 	for _, reporter := range m.reporters { reporter.OnResponse(req, res) }
+
+	m.processSession(req.Session)
 }

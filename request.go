@@ -11,6 +11,7 @@ type Request struct {
 	*http.Request
 
 	Scenario *Scenario
+	Session  *Session
 
 	id        int
 
@@ -33,6 +34,7 @@ func NewRequest(id int, scenario *Scenario, method string, strUrl string, body i
 	return &Request{
 		Request:   req,
 		Scenario:  scenario,
+		Session:   new(Session),
 		id:        id,
 		delay:     0,
 		feeders:   make([]Feeder, 0),
