@@ -32,22 +32,15 @@ import (
 func main() {
 	m := marto.NewMarto()
 
-	s := marto.NewScenario()
-	s.AppendRequestFromConfig("GET", "http://google.com", nil, 0)
-	s.AppendRequestFromConfig("GET", "http://google.com/search?q=test", nil, 1000)
+	s := marto.NewScenario("search")
+	s.Append("GET", "http://google.com", nil)
+	req := s.Append("GET", "http://google.com/search?q=test", nil)
+	req.SetDelay(2000)
 	s.Repeat(2)
-	m.AddScenario("search", s)
+	m.AddScenario(s)
+	
+	m.AddReporter(&marto.SimpleReporter{})
 
-	m.Start("search")
-
-	m.AggregateRequestStats()
-
-	for _, aggReqStat := range m.AggregatedRequestStats {
-		fmt.Printf("%s - %d request(s) - average: %dms (total %dms)\n", aggReqStat.Url, aggReqStat.Count, aggReqStat.AverageDuration / 1000000, aggReqStat.Total / 1000000)
-
-		for statusCode, count := range aggReqStat.StatusCodes {
-			fmt.Printf("  %d -> %d request(s)\n", statusCode, count)			
-		}
-	}
+	m.Run()
 }
 ````
