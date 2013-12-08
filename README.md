@@ -42,8 +42,6 @@ func main() {
 
 	m.AggregateRequestStats()
 
-	fmt.Print("\n\n")
-
 	for _, aggReqStat := range m.AggregatedRequestStats {
 		fmt.Printf("%s - %d request(s) - average: %dms (total %dms)\n", aggReqStat.Url, aggReqStat.Count, aggReqStat.AverageDuration / 1000000, aggReqStat.Total / 1000000)
 
@@ -51,7 +49,5 @@ func main() {
 			fmt.Printf("  %d -> %d request(s)\n", statusCode, count)			
 		}
 	}
-
-	fmt.Print("\n\n")
 }
 ````
