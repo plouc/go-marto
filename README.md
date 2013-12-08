@@ -12,12 +12,7 @@ To install go-marto, use `go get`:
 Import the `go-marto` package into your code:
 
 ```go
-package whatever
-
-import (
-	"os"
-	"github.com/plouc/go-marto"
-)
+import "github.com/plouc/go-marto"
 ```
 
 ##Basic usage
