@@ -7,6 +7,37 @@ import (
 	//"fmt"
 )
 
+type RequestTemplate struct {
+	Method string
+	Url    string
+	Body   io.Reader
+	delay  uint64
+}
+
+func NewRequestTemplate(method string, url string, body io.Reader) *RequestTemplate {
+	return &RequestTemplate{
+		Method: method,
+		Url:    url,
+		Body:   body,
+	}
+}
+
+func (rt *RequestTemplate) SetDelay(delay uint64) *RequestTemplate {
+	rt.delay = delay
+
+	return rt
+}
+
+func (rt *RequestTemplate) HasDelay() bool {
+	return rt.delay > 0
+}
+
+func (rt *RequestTemplate) Delay() uint64 {
+	return rt.delay
+}
+
+
+
 type Request struct {
 	*http.Request
 

@@ -68,7 +68,7 @@ s := marto.NewScenario("search").Repeat(100).Every(100)
 s.Append("GET", "http://google.com", nil)
 ````
 
-Now you will spawn a request every 100ms until the desired count.
+Now you will spawn a request every 100ms until the desired count is reached.
 
 Consider this other example:
 
@@ -96,13 +96,13 @@ The package provide a simple reporter accepting an **io.Writer**, it can be used
 
 Note that you can add several reporters on a single Marto.
 
-####a WriterReporter using stdout
+####WriterReporter using stdout
 
 ````go
 m.AddReporter(marto.NewWriterReporter(os.Stdout))
 ````
 
-####a WriterReporter using a file 
+####WriterReporter using a file 
 
 ````go
 fo, err := os.Create("marto.log")

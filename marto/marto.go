@@ -65,52 +65,56 @@ func (m *Marto) runScenario(scenario *Scenario) {
 	}
 
 	for i := 0; i < scenario.RepeatCount(); i++ {
-		session := scenario.CreateSession()
 
-		for _, reporter := range m.reporters {
-			reporter.OnSessionStarted(session)
-		}
+		delay := scenario.GetDelay() * int(time.Millisecond) * i
 
-		go func() {
-			m.processSession(session)
-		}()
+		select {
+        case <-time.After(time.Duration(delay)):
+        	sess := scenario.CreateSession()
+		    for _, reporter := range m.reporters {
+		    	reporter.OnSessionStarted(sess)
+		    }
+		    go func() { m.processSession(sess) }()
+        }
 	}
 }
 
 // send current session request
 func (m *Marto) processSession(sess *Session) {
 	if !sess.HasFinished() {
-		req := sess.ConsumeRequest()
+		req, tpl := sess.Request()
 		
-		delay := int(req.Delay() * uint64(time.Millisecond))
-		if req.IsFirst() {
+		delay := int(tpl.Delay() * uint64(time.Millisecond))
+		if sess.Current == 0 {
 			delay += sess.Scenario.GetDelay() * int(time.Millisecond) * sess.Id()
 		}
 
 		select {
         case <-time.After(time.Duration(delay)):
-        	m.doRequest(req)
+        	m.doSessionRequest(sess, req)
         }
 	} else {
+		for _, reporter := range m.reporters {
+			reporter.OnSessionFinished(sess)
+		}
 		ch <- sess
 	}
 }
 
 // send a request
-func (m *Marto) doRequest(req *Request) {
+func (m *Marto) doSessionRequest(sess *Session, req *http.Request) {
+	for _, reporter := range m.reporters {
+		reporter.OnRequest(sess, req)
+	}
 
-	for _, reporter := range m.reporters { reporter.OnRequest(req) }
-
-	req.Start()
-
-	res, err := m.client.Do(req.Request)
+	res, err := m.client.Do(req)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	req.End()
+	for _, reporter := range m.reporters {
+		reporter.OnResponse(sess, req, res)
+	}
 
-	for _, reporter := range m.reporters { reporter.OnResponse(req, res) }
-
-	m.processSession(req.Session)
+	m.processSession(sess)
 }

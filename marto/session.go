@@ -1,9 +1,10 @@
 package marto
 
+import "net/http"
+
 type Session struct {
 	id       int // private because it must be set according to scenario.Sessions size
-	current  int
-	requests []*Request
+	Current  int
 	finished bool
 	Scenario *Scenario
 }
@@ -11,9 +12,8 @@ type Session struct {
 func NewSession(scenario *Scenario) *Session {
 	return &Session{
 		id:       len(scenario.Sessions()),
-		current:  0,
+		Current:  0,
 		Scenario: scenario,
-		requests: scenario.Requests(),
 		finished: false,
 	}
 }
@@ -22,17 +22,24 @@ func (s *Session) Id() int {
 	return s.id
 }
 
-func (s *Session) ConsumeRequest() *Request {
-	req := s.requests[s.current]
-	req.Session = s
+func (s *Session) Request() (*http.Request, *RequestTemplate) {
+	if s.finished {
+		panic("Cannot get request from finished session")
+	}
 
-	if s.current < (len(s.requests) - 1) {
-		s.current++
+	tpl := s.Scenario.Request(s.Current)
+	req, err := http.NewRequest(tpl.Method, tpl.Url, tpl.Body)
+    if err != nil {
+    	panic(err)
+    }
+
+	if s.Current < s.Scenario.RequestCount()-1 {
+		s.Current++
 	} else {
 		s.finished = true
 	}
 
-	return req
+	return req, tpl
 }
 
 func (s *Session) HasFinished() bool {
