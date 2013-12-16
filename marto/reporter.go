@@ -159,9 +159,12 @@ func (r *BaseReporter) OnRequest(session *Session, request *http.Request) {
 		StartedAt: time.Now(),
 	}
 
-	r.ScenariosStats[session.Scenario.Id].UpdateReqCount(1)
-	if _, ok := r.ScenariosStats[session.Scenario.Id].Stats[computeRequestId(request)]; !ok {
-		r.ScenariosStats[session.Scenario.Id].Stats[computeRequestId(request)] = &RequestStats{
+	scenId := session.Scenario.Id
+	reqId  := strconv.Itoa(session.Current)
+
+	r.ScenariosStats[scenId].UpdateReqCount(1)
+	if _, ok := r.ScenariosStats[scenId].Stats[reqId]; !ok {
+		r.ScenariosStats[scenId].Stats[reqId] = &RequestStats{
 			Method: request.Method,
 			Url:    request.URL.String(),
 		}
@@ -183,7 +186,7 @@ func (r *BaseReporter) OnResponse(session *Session, request *http.Request, respo
 	}
 
 	scenId := session.Scenario.Id
-	reqId  := computeRequestId(request)
+	reqId  := strconv.Itoa(session.Current)
 
 	r.ScenariosStats[scenId].UpdateReqCount(-1)
 	r.ScenariosStats[scenId].Stats[reqId].Count++

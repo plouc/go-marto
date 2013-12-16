@@ -3,22 +3,29 @@ package marto
 import (
 	"net/http"
 	"io"
-	"time"
-	//"fmt"
 )
 
+type BasicAuth struct {
+	username string
+	password string
+}
+
 type RequestTemplate struct {
-	Method string
-	Url    string
-	Body   io.Reader
-	delay  uint64
+	Method    string
+	Url       string
+	Body      io.Reader
+	delay     uint64
+	Headers   map[string]string
+	BasicAuth *BasicAuth
 }
 
 func NewRequestTemplate(method string, url string, body io.Reader) *RequestTemplate {
 	return &RequestTemplate{
-		Method: method,
-		Url:    url,
-		Body:   body,
+		Method:    method,
+		Url:       url,
+		Body:      body,
+		Headers:   make(map[string]string),
+		BasicAuth: nil,
 	}
 }
 
@@ -36,80 +43,27 @@ func (rt *RequestTemplate) Delay() uint64 {
 	return rt.delay
 }
 
-
-
-type Request struct {
-	*http.Request
-
-	Scenario *Scenario
-	Session  *Session
-
-	id        int
-
-	delay     uint64
-
-	feeders   []Feeder
-
-	StartedAt time.Time
-	EndedAt   time.Time
-	Elapsed   time.Duration
+func (rt *RequestTemplate) AddHeader(key string, value string) {
+	rt.Headers[key] = value
 }
 
-func NewRequest(id int, scenario *Scenario, method string, strUrl string, body io.Reader) (*Request, error) {
+func (rt *RequestTemplate) SetBasicAuth(username string, password string) {
+	rt.BasicAuth = &BasicAuth{username, password}
+}
 
-	req, err := http.NewRequest(method, strUrl, body)
-	if err != nil {
-		return nil, err
+func BuildRequest(tpl *RequestTemplate) *http.Request {
+	req, err := http.NewRequest(tpl.Method, tpl.Url, tpl.Body)
+    if err != nil {
+    	panic(err)
+    }
+
+    if tpl.BasicAuth != nil {
+    	req.SetBasicAuth(tpl.BasicAuth.username, tpl.BasicAuth.password)
+    }
+
+    for hKey, hValue := range tpl.Headers {
+		req.Header.Set(hKey, hValue)
 	}
 
-	return &Request{
-		Request:   req,
-		Scenario:  scenario,
-		Session:   new(Session),
-		id:        id,
-		delay:     0,
-		feeders:   make([]Feeder, 0),
-		StartedAt: time.Time{},
-		EndedAt:   time.Time{},
-		Elapsed:   time.Duration(0),
-	}, nil
-}
-
-func (r *Request) IsFirst() bool {
-	return r.id == 0
-}
-
-func (r *Request) Start() {
-	r.StartedAt = time.Now()
-}
-
-func (r *Request) End() {
-	r.EndedAt = time.Now()
-	r.Elapsed = time.Since(r.StartedAt)
-}
-
-func (r *Request) Id() int {
-	return r.id
-}
-
-func (r *Request) HasDelay() bool {
-	return r.delay > 0
-}
-
-func (r *Request) SetDelay(delay uint64) *Request {
-	r.delay = delay
-
-	return r
-}
-
-func (r *Request) Delay() uint64 {
-	return r.delay
-}
-
-func (r *Request) BindFeeder(f Feeder) {
-	r.feeders = append(r.feeders, f)
-}
-
-func (r *Request) Resolve() {
-	//fmt.Printf("%#v\n", r.URL)
+    return req
 }

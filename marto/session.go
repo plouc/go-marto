@@ -12,7 +12,7 @@ type Session struct {
 func NewSession(scenario *Scenario) *Session {
 	return &Session{
 		id:       len(scenario.Sessions()),
-		Current:  0,
+		Current:  -1,
 		Scenario: scenario,
 		finished: false,
 	}
@@ -27,17 +27,14 @@ func (s *Session) Request() (*http.Request, *RequestTemplate) {
 		panic("Cannot get request from finished session")
 	}
 
-	tpl := s.Scenario.Request(s.Current)
-	req, err := http.NewRequest(tpl.Method, tpl.Url, tpl.Body)
-    if err != nil {
-    	panic(err)
-    }
-
-	if s.Current < s.Scenario.RequestCount()-1 {
+	if s.Current < (s.Scenario.RequestCount()-1) {
 		s.Current++
 	} else {
 		s.finished = true
 	}
+
+	tpl := s.Scenario.Request(s.Current)
+	req := BuildRequest(tpl)
 
 	return req, tpl
 }

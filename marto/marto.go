@@ -60,6 +60,8 @@ func (m *Marto) runScenario(scenario *Scenario) {
 		panic(fmt.Sprintf("No request found on scenario: %s", scenario.Id))	
 	}
 
+	fmt.Printf("\nScenario repeat: %d\n", scenario.RepeatCount())
+
 	for _, reporter := range m.reporters {
 		reporter.OnScenarioStarted(scenario)
 	}
@@ -80,31 +82,33 @@ func (m *Marto) runScenario(scenario *Scenario) {
 }
 
 // send current session request
-func (m *Marto) processSession(sess *Session) {
-	if !sess.HasFinished() {
-		req, tpl := sess.Request()
+func (m *Marto) processSession(session *Session) {
+	if session.HasFinished() == false {
+		req, tpl := session.Request()
+
+		fmt.Printf("\nSession finished: %t, current: %d\n\n", session.HasFinished(), session.Current)
 		
 		delay := int(tpl.Delay() * uint64(time.Millisecond))
-		if sess.Current == 0 {
-			delay += sess.Scenario.GetDelay() * int(time.Millisecond) * sess.Id()
+		if session.Current == 0 {
+			delay += session.Scenario.GetDelay() * int(time.Millisecond) * session.Id()
 		}
 
 		select {
         case <-time.After(time.Duration(delay)):
-        	m.doSessionRequest(sess, req)
+        	m.doSessionRequest(session, req)
         }
 	} else {
 		for _, reporter := range m.reporters {
-			reporter.OnSessionFinished(sess)
+			reporter.OnSessionFinished(session)
 		}
-		ch <- sess
+		ch <- session
 	}
 }
 
 // send a request
-func (m *Marto) doSessionRequest(sess *Session, req *http.Request) {
+func (m *Marto) doSessionRequest(session *Session, req *http.Request) {
 	for _, reporter := range m.reporters {
-		reporter.OnRequest(sess, req)
+		reporter.OnRequest(session, req)
 	}
 
 	res, err := m.client.Do(req)
@@ -113,8 +117,8 @@ func (m *Marto) doSessionRequest(sess *Session, req *http.Request) {
 	}
 
 	for _, reporter := range m.reporters {
-		reporter.OnResponse(sess, req, res)
+		reporter.OnResponse(session, req, res)
 	}
 
-	m.processSession(sess)
+	m.processSession(session)
 }
