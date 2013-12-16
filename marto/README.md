@@ -92,21 +92,24 @@ Now the first session will start at 0ms, the first request of this session will 
 
 ##Reporting
 
-###WriterReporter
+###BaseReporter
 
-The package provide a simple reporter accepting an **io.Writer**, it can be used to send reporting to stdout, file…
+The package provide a simple reporter accepting any **io.Writer**, it can be used to send reporting to stdout, file…
 
 Note that you can add several reporters on a single Marto.
 
-####WriterReporter using stdout
+####BaseReporter using stdout
 
 ````go
-m.AddReporter(marto.NewWriterReporter(os.Stdout))
+reporter := marto.NewBaseReporter()
+reporter.AddWriter(os.Stdout)
+m.AddReporter(reporter)
 ````
 
-####WriterReporter using a file 
+####BaseReporter using a file 
 
 ````go
+reporter := marto.NewBaseReporter()
 fo, err := os.Create("marto.log")
 if err != nil { panic(err) }
 defer func() {
@@ -114,17 +117,8 @@ defer func() {
         panic(err)
     }
 }()
-m.AddReporter(marto.NewWriterReporter(fo))
-````
-
-###AggregatorReporter
-
-The **AggregatorReporter** automatically store the number of request iterations and compute the average duration plus an histogram of requests per second.
-
-````go
-m.AddReporter(marto.NewAggregatorReporter())
-reporter.Dump(os.Stdout)
-reporter.DumpJson(os.Stdout)
+reporter.AddWriter(fo)
+m.AddReporter(reporter)
 ````
 
 ###Customize
