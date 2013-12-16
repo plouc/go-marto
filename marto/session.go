@@ -27,9 +27,11 @@ func (s *Session) Request() (*http.Request, *RequestTemplate) {
 		panic("Cannot get request from finished session")
 	}
 
-	if s.Current < (s.Scenario.RequestCount()-1) {
+	if s.Current < s.Scenario.RequestCount()-1 {
 		s.Current++
-	} else {
+	}
+
+	if s.Current == s.Scenario.RequestCount()-1 {
 		s.finished = true
 	}
 

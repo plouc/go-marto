@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"fmt"
-	"os"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,7 +22,6 @@ func TestRunOneScenarioWithOneRequest(t *testing.T) {
 	m.AddScenario(scenario)
 
 	reporter := NewBaseReporter()
-	reporter.AddWriter(os.Stdout)
 	m.AddReporter(reporter)
 
 	m.Run()
@@ -44,7 +42,7 @@ func TestRunOneScenarioWithOneRequest(t *testing.T) {
 	assert.Equal(t, len(report.Histogram), 1, "reports histogram contain one request")
 }
 
-/*
+
 func TestRunOneScenarioWithThreeRequests(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "")
@@ -87,8 +85,6 @@ func TestRunOneScenarioWithThreeRequests(t *testing.T) {
 	assert.Equal(t, stats.Count, 1)
 	assert.Equal(t, len(report.Histogram), 1)
 
-	fmt.Printf("%#v", report.Stats)
-
 	stats, ok = report.Stats["2"]
 	assert.True(t, ok)
 	assert.IsType(t, new(RequestStats), stats)
@@ -97,4 +93,3 @@ func TestRunOneScenarioWithThreeRequests(t *testing.T) {
 	assert.Equal(t, stats.Count, 1)
 	assert.Equal(t, len(report.Histogram), 1)
 }
-*/

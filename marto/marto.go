@@ -60,8 +60,6 @@ func (m *Marto) runScenario(scenario *Scenario) {
 		panic(fmt.Sprintf("No request found on scenario: %s", scenario.Id))	
 	}
 
-	fmt.Printf("\nScenario repeat: %d\n", scenario.RepeatCount())
-
 	for _, reporter := range m.reporters {
 		reporter.OnScenarioStarted(scenario)
 	}
@@ -85,8 +83,6 @@ func (m *Marto) runScenario(scenario *Scenario) {
 func (m *Marto) processSession(session *Session) {
 	if session.HasFinished() == false {
 		req, tpl := session.Request()
-
-		fmt.Printf("\nSession finished: %t, current: %d\n\n", session.HasFinished(), session.Current)
 		
 		delay := int(tpl.Delay() * uint64(time.Millisecond))
 		if session.Current == 0 {
@@ -107,6 +103,7 @@ func (m *Marto) processSession(session *Session) {
 
 // send a request
 func (m *Marto) doSessionRequest(session *Session, req *http.Request) {
+
 	for _, reporter := range m.reporters {
 		reporter.OnRequest(session, req)
 	}
