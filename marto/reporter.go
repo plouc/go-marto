@@ -54,6 +54,7 @@ type RequestStat struct {
 
 // Stats for a group of similar requests
 type RequestStats struct {
+	Id      string `json:"id"`
 	Method  string `json:"method"`
 	Url     string `json:"url"`
 	Count   int    `json:"count"`
@@ -80,7 +81,7 @@ type BaseReporter struct {
 	OnSessionStartedFn   func(session *Session)
 	OnSessionFinishedFn  func(session *Session)
 	OnRequestFn          func(session *Session, request *http.Request)
-	OnResponseFn         func(session *Session, request *http.Request, response *http.Response)
+	OnResponseFn         func(session *Session, request *http.Request, response *http.Response, stat *RequestStats)
 }
 
 func NewBaseReporter() *BaseReporter {
@@ -104,11 +105,13 @@ func (r *BaseReporter) OnScenarioStarted(scenario *Scenario) {
 	}
 
 	r.ScenariosStats[scenario.Id] = &ScenarioStats{
-		Histogram: make(map[string]int),
+		Histogram: make(map[string]int, 0),
 		Stats:     map[string]*RequestStats{},
 	}
 
-	if r.OnScenarioStartedFn != nil { r.OnScenarioStartedFn(scenario) }
+	if r.OnScenarioStartedFn != nil {
+		r.OnScenarioStartedFn(scenario)
+	}
 }
 
 // Called when a scenario finished
@@ -165,6 +168,7 @@ func (r *BaseReporter) OnRequest(session *Session, request *http.Request) {
 	r.ScenariosStats[scenId].UpdateReqCount(1)
 	if _, ok := r.ScenariosStats[scenId].Stats[reqId]; !ok {
 		r.ScenariosStats[scenId].Stats[reqId] = &RequestStats{
+			Id:     reqId,
 			Method: request.Method,
 			Url:    request.URL.String(),
 		}
@@ -193,8 +197,10 @@ func (r *BaseReporter) OnResponse(session *Session, request *http.Request, respo
 	r.ScenariosStats[scenId].Stats[reqId].Total += r.RequestStats[request].Duration.Nanoseconds()
 	r.ScenariosStats[scenId].Stats[reqId].Average = r.ScenariosStats[scenId].Stats[reqId].Total / int64(r.ScenariosStats[scenId].Stats[reqId].Count)
 
-
-	if r.OnResponseFn != nil {	r.OnResponseFn(session, request, response) }
+	// if callback not nil, call it
+	if r.OnResponseFn != nil {
+		r.OnResponseFn(session, request, response, r.ScenariosStats[scenId].Stats[reqId])
+	}
 }
 
 // Dump currently collected metrics

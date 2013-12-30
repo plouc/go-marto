@@ -17,7 +17,7 @@ Import the `go-marto` package into your code:
 import "github.com/plouc/go-marto/marto"
 ```
 
-##Basic usage
+###Basic usage
 
 ````go
 package main
