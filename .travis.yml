@@ -8,11 +8,10 @@ before_script:
 install:
   - go get github.com/stretchr/testify/assert
   - go get labix.org/v2/mgo
+  - go get github.com/gorilla/mux
 
 services:
   - mongodb
 
 script:
-  - cd marto && go test -v
-  - cd ../api && go test -v
-  - cd .. && karma start --single-run --browsers PhantomJS app/config/karma.conf.js
+  - test_all
