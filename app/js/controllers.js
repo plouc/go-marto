@@ -115,6 +115,8 @@ angular.module('martoApp.controllers', []).
   controller('ScenarioEditCtrl',
     ['$scope', '$location', '$routeParams', 'Marto', 'Scenario',
     function ($scope, $location, $routeParams, Marto, Scenario) {
+      $scope.setSection('edit-scenario');
+
       Scenario.get({
         id: $routeParams.id
       }, function(response) {
