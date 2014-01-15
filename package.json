@@ -1,0 +1,13 @@
+{
+  "name": "go-marto-gui",
+  "description": "go-marto GUI",
+  "repository": "https://github.com/plouc/go-marto",
+  "devDependencies": {
+    "phantomjs": "~1.9",
+    "karma": "~0.10",
+    "karma-junit-reporter": "~0.1",
+    "karma-jasmine": "~0.1",
+    "karma-ng-scenario": "~0.1",
+    "karma-spec-reporter": "*"
+  }
+}
