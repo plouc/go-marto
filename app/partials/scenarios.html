@@ -1,0 +1,24 @@
+<h3>Scenarios</h3>
+<table class="scenarios">
+    <tbody>
+    <tr class="scenario-item" ng-repeat="scenario in scenarios">
+        <td>
+            <strong>{{ scenario.id }}</strong>
+        </td>
+        <td>
+            repeat <strong>{{ scenario.repeat }}</strong> time(s)
+        </td>
+        <td>
+            every <strong>{{ scenario.every }}</strong> second(s)
+        </td>
+        <td>
+            <span ng-click="runScenario(scenario)">run</span>
+            <a href="#scenarios/{{ scenario.id }}/edit">edit</a>
+            <a href="#scenarios/{{ scenario.id }}/remove">remove</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<p ng-show="scenarios.length == 0">
+    no scenario, <span ng-click="newScenario()" class="link">add one</span>.
+</p>
