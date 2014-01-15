@@ -6,17 +6,17 @@ import (
 )
 
 type BasicAuth struct {
-	username string
-	password string
+	username string `json:"username"schema:"username"`
+	password string `json:"password"schema:"password"`
 }
 
 type RequestTemplate struct {
-	Method    string
-	Url       string
-	Body      io.Reader
-	delay     uint64
-	Headers   map[string]string
-	BasicAuth *BasicAuth
+	Method    string            `json:"method"schema:"method"`
+	Url       string            `json:"url"schema:"url"`
+	Body      io.Reader         `json:"body"schema:"body"`  
+	delay     uint64            `json:"delay"schema:"delay"`
+	Headers   map[string]string `json:"headers"schema:"headers"`
+	BasicAuth *BasicAuth        `json:"basic_auth"schema:"basic_auth"`
 }
 
 func NewRequestTemplate(method string, url string, body io.Reader) *RequestTemplate {

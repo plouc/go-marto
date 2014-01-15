@@ -2,13 +2,16 @@ package marto
 
 import (
 	"io"
+
+	"labix.org/v2/mgo/bson"
 )
 
 type ScenarioConfig struct {
-	Id       string             `json:"id"`
-	Repeat   int                `json:"repeat"`
-	Every    int                `json:"every"`
-	Requests []*RequestTemplate `json:"requests"`
+	Oid      bson.ObjectId      `bson:"_id,omitempty" json:"_id"`
+	Id       string             `bson:"id"            json:"id"       schema:"id"`
+	Repeat   int                `bson:"repeat"        json:"repeat"   schema:"repeat"`
+	Every    int                `bson:"every"         json:"every"    schema:"every"`
+	Requests []*RequestTemplate `bson:"requests"      json:"requests" schema:"requests"`
 }
 
 type Scenario struct {

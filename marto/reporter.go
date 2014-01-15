@@ -133,7 +133,9 @@ func (r *BaseReporter) OnSessionStarted(session *Session) {
 		}
 	}
 
-	if r.OnSessionStartedFn != nil { r.OnSessionStartedFn(session) }
+	if r.OnSessionStartedFn != nil {
+		r.OnSessionStartedFn(session)
+	}
 }
 
 // Called when a session finished
@@ -144,7 +146,9 @@ func (r *BaseReporter) OnSessionFinished(session *Session) {
 		}
 	}
 
-	if r.OnSessionFinishedFn != nil { r.OnSessionFinishedFn(session) }
+	if r.OnSessionFinishedFn != nil {
+		r.OnSessionFinishedFn(session)
+	}
 }
 
 // Called when a request started:
