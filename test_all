@@ -3,6 +3,7 @@
 
 # GO tests
 cd marto && go test -v -cover
+cd ../api && go test -v -cover
 
 # JS tests
 cd .. && karma start --single-run --browsers PhantomJS app/config/karma.conf.js

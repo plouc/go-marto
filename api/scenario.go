@@ -17,7 +17,7 @@ type ScenarioService struct {
 	collection *mgo.Collection
 }
 
-func NewScenarioService(mgoSession *mgo.Session) *ScenarioService {
+func NewScenarioService(mgoSession *mgo.Session, db string) *ScenarioService {
 
 	index := mgo.Index{
 		Key:        []string{"id"},
@@ -26,7 +26,7 @@ func NewScenarioService(mgoSession *mgo.Session) *ScenarioService {
 		Background: true,
 		Sparse:     true,
 	}
-	collection := mgoSession.DB("marto").C("scenarios")
+	collection := mgoSession.DB(db).C("scenarios")
 	err := collection.EnsureIndex(index)
 	if err != nil {
 		panic(err)

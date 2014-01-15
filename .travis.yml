@@ -1,11 +1,18 @@
 language: go
 go: 1.2
+
 before_script:
   - npm install --quiet -g karma
   - npm install
+
 install:
   - go get github.com/stretchr/testify/assert
   - go get labix.org/v2/mgo
+
+services:
+  - mongodb
+
 script:
   - cd marto && go test -v
+  - cd ../api && go test -v
   - cd .. && karma start --single-run --browsers PhantomJS app/config/karma.conf.js
