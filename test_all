@@ -1,9 +1,15 @@
-#!/bin/sh
+#!/bin/bash
+
+TEMPLATE="\n\n\x1b[38;05;255m\x1b[48;05;25m %d/3 \x1b[48;05;4m %s \x1b[0m\n"
 
 
-# GO tests
+printf "$TEMPLATE" 1 "Testing golang marto package"
 cd marto && go test -v -cover
+
+
+printf "$TEMPLATE" 2 "Testing golang api package"
 cd ../api && go test -v -cover
 
-# JS tests
+
+printf "$TEMPLATE" 3 "Testing angular app"
 cd .. && karma start --single-run --browsers PhantomJS app/config/karma.conf.js
