@@ -45,6 +45,30 @@ angular.module('martoApp.controllers', []).
   }]).
 
   /**
+   * Scenarios controller
+   */
+  controller('ScenariosCtrl',
+    ['$scope', 'Scenarios',
+    function ($scope, Scenarios) {
+
+      $scope.setSection('scenarios');
+
+      $scope.scenarios = [];
+
+      $scope.loadScenarios = function() {
+        Scenarios.get({},
+        function(response) {
+          console.log(response);
+          $scope.scenarios = response;
+        },
+        function(e) {
+          console.log(e);
+        });
+      };
+      $scope.loadScenarios();
+  }]).
+
+  /**
    * Scenario create controller
    */
   controller('ScenarioCreateCtrl',
