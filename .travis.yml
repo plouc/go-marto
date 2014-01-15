@@ -1,6 +1,9 @@
 language: go
 go: 1.2
+before_script:
+  - npm install karma
 install:
   - go get github.com/stretchr/testify/assert
 script:
   - cd marto && go test -v
+  - karma start --single-run --browsers PhantomJS app/config/karma.conf.js
