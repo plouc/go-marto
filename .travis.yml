@@ -1,7 +1,8 @@
 language: go
 go: 1.2
 before_script:
-  - npm install karma
+  - npm install --quiet -g karma
+  - npm install
 install:
   - go get github.com/stretchr/testify/assert
 script:
