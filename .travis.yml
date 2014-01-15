@@ -14,4 +14,4 @@ services:
   - mongodb
 
 script:
-  - test_all
+  - bash test_all
