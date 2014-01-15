@@ -5,6 +5,7 @@ before_script:
   - npm install
 install:
   - go get github.com/stretchr/testify/assert
+  - go get labix.org/v2/mgo
 script:
   - cd marto && go test -v
   - cd .. && karma start --single-run --browsers PhantomJS app/config/karma.conf.js
