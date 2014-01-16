@@ -44,7 +44,7 @@ describe('Scenario remove controller', function () {
   }));
 
 
-  it('Change current section', function () {
+  it('Should change current section', function () {
     expect(scope.section).toBe('remove-scenario');
   });
 

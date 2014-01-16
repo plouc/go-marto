@@ -40,7 +40,7 @@ describe('Scenario create controller', function () {
   }));
 
 
-  it('Change current section', function () {
+  it('Should change current section', function () {
     expect(scope.section).toBe('new-scenario');
   });
 
