@@ -1,0 +1,59 @@
+@mixin button-color($bg, $font) {
+  color:        $font;
+  background:   $bg;
+  &:hover {
+    background: lighten($bg, 7%);
+  }
+  &.active {
+    background: darken($bg, 5%);
+  }
+}
+
+.button {
+  display: inline-block;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 1rem;
+  text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+  border: none;
+  text-transform: none;
+  box-sizing: border-box;
+  border-radius: 2px;
+
+  &.button--small {
+    font-size: 12px;
+    padding: 3px 7px;
+  }
+
+  &:hover {
+    border: none;
+  }
+
+  @include button-color($ground_color, lighten($font_color, 10%));
+}
+.button:disabled {
+  background: #000 !important;
+}
+
+.button-group {
+  font-size: 0;
+  .button {
+    font-size: 1rem;
+    border-radius: 0;
+    &:first-child {
+      border-radius: 2px 0 0 2px;
+    }
+    &:last-child {
+      border-radius: 0 2px 2px 0;
+    }
+  }
+}
+
+.button--cancel { @include button-color($cancel_color, $bg_color); }
+.button--cancel:disabled {
+  background: #000 !important;
+}
+.button--remove { @include button-color($error_color, $bg_color);  }

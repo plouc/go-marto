@@ -1,25 +1,42 @@
-<h3>New scenario</h3>
-<p>
- <label>id</label>
- <input class="form-control" type="text" ng-model="scenario.id">
- <label>repeat</label>
- <input class="form-control form-control--small" type="number" ng-model="scenario.repeat">
- <span>time(s)</span>
- <label>every</label>
- <input class="form-control form-control--medium" type="number" step="100" ng-model="scenario.every">
- <span>ms</span>
- <span class="button" ng-click="saveScenario()">save</span>
- <span class="button" ng-click="cancel()">cancel</span>
-</p>
+<h3 class="page-title">New scenario</h3>
 
-<h3>Requests <span class="button" ng-click="addRequest()">add request</span></h3>
-<ul class="requests">
-  <li class="request-item" ng-repeat="request in scenario.requests">
-    <select ng-model="request.method" required ng-options="method.method for method in httpMethods">
-    </select>
-    <input class="form-control" type="text" ng-model="request.url">
-    <label>delay</label>
-    <input class="form-control form-control--small" type="text" ng-model="request.delay">
-    <span class="button" ng-click="removeRequest($index)">X</span>
-  </li>
-</ul>
+<div class="main-content">
+  <form name="form" class="css-form" novalidate>
+    <p>
+     <!--<label>id</label>-->
+     <input class="form-control" type="text" ng-model="scenario.id" name="sId" required placeholder="scenario id">
+
+     <label>repeat</label>
+     <input class="form-control form-control--small" type="number" ng-model="scenario.repeat" required>
+     <span>time(s)</span>
+
+     <label>every</label>
+     <input class="form-control form-control--medium" type="number" step="100" ng-model="scenario.every" required>
+     <span>ms</span>
+    </p>
+
+    <p>
+      <span class="button" ng-click="saveScenario()" ng-disabled="form.$invalid || isUnchanged(user)">save</span>
+      <span ng-show="section == 'new-scenario'" class="button button--cancel" ng-click="cancel()">reset</span>
+      <span class="button button--remove" ng-click="cancel()">cancel</span>
+    </p>
+
+    <ul>
+      <li ng-show="form.sId.$dirty && form.sId.$invalid">Invalid:
+        <span ng-show="form.sId.$error.required">Tell us your email.</span>
+      </li>
+    </ul>
+
+    <h3>Requests <span class="button" ng-click="addRequest()">add request</span></h3>
+    <ul class="requests">
+      <li class="request-item" ng-repeat="request in scenario.requests">
+        <select ng-model="request.method" required ng-options="method.method for method in httpMethods">
+        </select>
+        <input class="form-control" type="text" ng-model="request.url" required>
+        <label>delay</label>
+        <input class="form-control form-control--small" type="text" ng-model="request.delay" required>
+        <span class="button button--remove" ng-click="removeRequest($index)">X</span>
+      </li>
+    </ul>
+  </form>
+</div>

@@ -27,21 +27,6 @@ angular.module('martoApp.controllers', []).
       $scope.removeRequest = function(index) {
           $scope.scenario.requests.splice(index, 1);
       };
-
-      $scope.run = function() {
-          $scope.scenario.requests.forEach(function(request) {
-              request.method = request.method.method;
-          });
-          console.log($scope.scenario);
-          Marto.postScenario($scope.scenario);
-      };
-
-      Marto.on("request.started", function(event) {
-          $scope.logs.push({ type: event.type });
-      });
-      Marto.on("response.finished", function(event) {
-          $scope.logs.push({ type: event.type });
-      });
   }]).
 
 
@@ -77,11 +62,15 @@ angular.module('martoApp.controllers', []).
     function ($scope, $location, Marto, Scenario) {
       $scope.setSection('new-scenario');
 
-      $scope.scenario = {
+      $scope.master = {
         id:    '',
         repeat: 1,
         every:  0,
         requests: []
+      };
+
+      $scope.reset = function() {
+        $scope.scenario = angular.copy($scope.master);
       };
 
       $scope.addRequest = function() {
@@ -91,7 +80,6 @@ angular.module('martoApp.controllers', []).
           delay:  0
         });
       };
-      $scope.addRequest();
 
       $scope.saveScenario = function() {
         $scope.scenario.requests.forEach(function(request) {
@@ -106,6 +94,9 @@ angular.module('martoApp.controllers', []).
       $scope.cancel = function() {
         $location.path('/scenarios');
       };
+
+      $scope.reset();
+      $scope.addRequest();
   }]).
 
 
@@ -152,4 +143,41 @@ angular.module('martoApp.controllers', []).
       $scope.cancel = function() {
         $location.path('/scenarios');
       };
-   }]);
+  }]).
+
+
+  /**
+   * Scenario run controller
+   */
+ controller('ScenarioRunCtrl',
+   ['$scope', '$location', '$routeParams', 'Marto', 'Scenario',
+   function ($scope, $location, $routeParams, Marto, Scenario) {
+     $scope.setSection('run-scenario');
+
+     Scenario.get({
+         id: $routeParams.id
+     }, function(response) {
+         $scope.scenario = response;
+     }, function() {
+     });
+
+     $scope.run = function() {
+       $scope.scenario.requests.forEach(function(request) {
+         request.method = request.method.method;
+       });
+       console.log($scope.scenario);
+       Marto.postScenario($scope.scenario);
+     };
+
+     Marto.on("request.started", function(event) {
+       $scope.logs.push({ type: event.type });
+     });
+     Marto.on("response.finished", function(event) {
+       $scope.logs.push({ type: event.type });
+     });
+
+     $scope.cancel = function() {
+         $location.path('/scenarios');
+     };
+ }])
+;

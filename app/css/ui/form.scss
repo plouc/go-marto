@@ -1,0 +1,38 @@
+.form-control {
+  outline: none;
+  box-sizing: border-box;
+  display: inline-block;
+  padding: 0 9px;
+  font-size: 14px;
+  height: 30px;
+  line-height: 30px;
+  vertical-align: middle;
+  background: lighten($ground_color, 10%);
+  border: 1px solid darken($bg_color, 20%);
+  color: $font_color;
+  border-radius: 2px;
+  &.ng-invalid.ng-dirty {
+    border-color: $error_color !important;
+    background: lighten($error_color, 35%);
+    @include placeholder {
+      color: desaturate(lighten($error_color, 15%), 30%);
+    }
+  }
+  @include placeholder {
+    font-style: italic;
+    color: desaturate(darken($ground_color, 15%), 30%);
+  }
+}
+.form-control:focus {
+  background: #fff;
+  border-color: darken($bg_color, 30%);
+  @include placeholder {
+    color: darken($bg_color, 20%);
+  }
+}
+.form-control--medium {
+  width: 128px;
+}
+.form-control--small {
+  width: 64px;
+}

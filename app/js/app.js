@@ -25,6 +25,10 @@ angular.module('martoApp',
       templateUrl: 'partials/scenario-remove.html',
       controller:  'ScenarioRemoveCtrl'
     }).
+    when('/scenarios/:id/run', {
+        templateUrl: 'partials/scenario-run.html',
+        controller:  'ScenarioRunCtrl'
+    }).
     otherwise({
       redirectTo: '/scenarios'
     });

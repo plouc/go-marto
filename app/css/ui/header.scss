@@ -1,0 +1,51 @@
+.header {
+  display: block;
+  background: $header_bg_color;
+  margin-bottom: 15px;
+  color: #fff;
+  overflow: hidden;
+  position: relative;
+  height: 120px;
+}
+.header--brand {
+  display: block;
+  position: absolute;
+  top:  26px;
+  left: 30px;
+  height: 65px;
+  width:  318px;
+  background: url("../imgs/marto-logo.png") no-repeat top left;
+  span {
+    display: none;
+  }
+}
+
+@media
+  screen and (-webkit-min-device-pixel-ratio: 2),
+  screen and (max--moz-device-pixel-ratio: 2) {
+    .header--brand {
+      background-image: url("../imgs/marto-logox2.png");
+      background-size: 318px 65px;
+    }
+}
+
+.header--nav {
+  position: absolute;
+  bottom: 0;
+  right: 30px;
+}
+.header--nav--item {
+  text-transform: lowercase;
+  display: block;
+  float: left;
+  padding: 5px 9px;
+  border-bottom: 3px solid $header_bg_color;
+  color: darken($header_bg_color, 15%);
+  &:hover {
+    border-color: darken($header_bg_color, 7%);
+  }
+  &.active {
+    color: darken($header_bg_color, 25%);
+    border-color: darken($header_bg_color, 15%);
+  }
+}

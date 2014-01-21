@@ -1,0 +1,105 @@
+/**
+ * VARS
+ */
+
+// colors
+$ground_color:    #fee974;
+$bg_color:        #f8f9f1;
+$font_color:      #40484a;
+$header_bg_color: #10b2cb;
+
+$action_color: #10b2cb;
+$cancel_color: #bea95f;
+$error_color:  #ff6343;
+
+// vendors
+@import "vendor/bourbon/bourbon";
+@import "vendor/font-awesome/font-awesome";
+
+@import "ui/button";
+@import "ui/form";
+@import "ui/nav";
+@import "ui/table";
+@import "ui/header";
+
+body {
+  background: $ground_color;
+  color: $font_color;
+}
+.site {
+  margin: 30px;
+}
+.main {
+  background: $bg_color;
+  min-height: 400px;
+}
+.page-title {
+  padding: 15px 0;
+  margin: 0 30px;
+  border-bottom: 1px solid $header_bg_color;
+}
+.main-content {
+  padding: 15px 30px;
+}
+.page-title + .main-content {
+  padding-top: 0;
+}
+a {
+  color: $font_color;
+  cursor: pointer;
+  border-bottom: 1px dotted;
+  text-decoration: none;
+}
+a:hover {
+  cursor: pointer;
+  border-bottom-style: solid;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: normal;
+  text-transform: uppercase;
+  color: $header_bg_color;
+}
+
+.content {
+  width: 74%;
+  float: left;
+}
+.aside {
+  width: 24%;
+  margin-left: 2%;
+  float: left;
+}
+
+.requests {
+  margin-left: 0;
+  padding-left: 0;
+}
+.request-item {
+  list-style: none;
+  margin-bottom: 3px;
+}
+
+.logs {
+  margin-left: 0;
+  padding-left: 0;
+  border: 1px solid #ccc;
+  background: #fff;
+  font-size: 13px;
+}
+.log-item {
+  list-style: none;
+  padding: 5px 9px;
+  border-top: 1px solid #ccc;
+}
+.log-item:first-child {
+  border-top: none;
+}
+
+.center-content {
+  text-align: center;
+}
+
+.remove {
+  display: inline-block;
+}

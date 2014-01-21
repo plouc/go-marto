@@ -1,6 +1,9 @@
-<h3>Remove scenario</h3>
-<p>Are you sure you want to remove <strong>{{ scenario.id }}</strong> scenario ?</p>
-<p class="center-content">
-	<span class="button" ng-click="removeScenario(scenario)">yes</span>
-	<span class="button" ng-click="cancel()">no</span>
-</p>
+<h3 class="page-title">Remove scenario</h3>
+
+<div class="main-content">
+  <p>
+    Are you sure you want to remove <strong>{{ scenario.id }}</strong> scenario ?
+    <span class="button button--remove" ng-click="removeScenario(scenario)">yes</span>
+    <span class="button button--cancel" ng-click="cancel()">no</span>
+  </p>
+</div>

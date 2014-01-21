@@ -1,0 +1,11 @@
+table {
+  border-collapse: collapse;
+  font-size: 13px;
+  td {
+    padding: 7px 12px;
+    border-top: 1px solid darken($bg_color, 10%);
+  }
+  tbody tr:first-child td {
+    border-top: none;
+  }
+}

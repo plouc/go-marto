@@ -15,23 +15,25 @@
   <link rel="stylesheet" href="css/marto.css" type="text/css">
 </head>
 <body ng-controller="MainCtrl">
-  <div class="content">
-    <nav class="top-nav">
-      <ul>
-        <li ng-class="{active: section == 'scenarios'}">
-          <a href="#scenarios">Scenarios</a>
-        </li>
-        <li ng-class="{active: section == 'new-scenario'}">
-          <a href="#scenarios/new">New scenario</a>
-        </li>
+  <div class="site">
+    <header class="header">
+      <span class="header--brand">
+        <span>Marto</span>
+      </span>
+      <nav class="header--nav">
+        <a class="header--nav--item" ng-class="{active: section == 'scenarios'}"    href="#scenarios">Scenarios</a>
+        <a class="header--nav--item" ng-class="{active: section == 'new-scenario'}" href="#scenarios/new">New scenario</a>
+        <a class="header--nav--item" ng-class="{active: section == 'reports'}"      href="#scenarios/new">Reports</a>
+      </nav>
+    </header>
+    <div class="main">
+      <div ng-view></div>
+    </div>
+    <div class="aside">
+      <ul class="logs">
+        <li class="log-item" ng-repeat="log in logs">{{ log.type }}</li>
       </ul>
-    </nav>
-    <div ng-view></div>
-  </div>
-  <div class="aside">
-    <ul class="logs">
-      <li class="log-item" ng-repeat="log in logs">{{ log.type }}</li>
-    </ul>
+    </div>
   </div>
 </body>
 </html>

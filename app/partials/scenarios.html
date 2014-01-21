@@ -1,6 +1,8 @@
-<h3>Scenarios</h3>
+<h3 class="page-title">Scenarios</h3>
+
+<div class="main-content">
 <table class="scenarios">
-    <tbody>
+  <tbody>
     <tr class="scenario-item" ng-repeat="scenario in scenarios">
         <td>
             <strong>{{ scenario.id }}</strong>
@@ -12,13 +14,20 @@
             every <strong>{{ scenario.every }}</strong> second(s)
         </td>
         <td>
-            <span ng-click="runScenario(scenario)">run</span>
-            <a href="#scenarios/{{ scenario.id }}/edit">edit</a>
-            <a href="#scenarios/{{ scenario.id }}/remove">remove</a>
+            <a class="button button--small" href="#scenarios/{{ scenario.id }}/run">
+              <i class="fa fa-play-circle"></i> run
+            </a>
+            <a class="button button--small button--cancel" href="#scenarios/{{ scenario.id }}/edit">
+              <i class="fa fa-pencil"></i> edit
+            </a>
+            <a class="button button--small button--remove" href="#scenarios/{{ scenario.id }}/remove">
+              <i class="fa fa-times"></i> remove
+            </a>
         </td>
     </tr>
-    </tbody>
+  </tbody>
 </table>
 <p ng-show="scenarios.length == 0">
     no scenario, <span ng-click="newScenario()" class="link">add one</span>.
 </p>
+</div>
