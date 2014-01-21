@@ -1368,6 +1368,14 @@
     .button-group .button:last-child {
       border-radius: 0 2px 2px 0; }
 
+.button--validate {
+  color: #f8f9f1;
+  background: #10b2cb; }
+  .button--validate:hover {
+    background: #13cfec; }
+  .button--validate.active {
+    background: #0e9db3; }
+
 .button--cancel {
   color: #f8f9f1;
   background: #bea95f; }
@@ -1426,7 +1434,7 @@
 
 .form-control:focus {
   background: #fff;
-  border-color: #c2cb86; }
+  border-color: #b9be93; }
   .form-control:focus::-webkit-input-placeholder {
     color: #d4daaa; }
   .form-control:focus:-moz-placeholder {
@@ -1500,7 +1508,11 @@ table {
 
 body {
   background: #fee974;
-  color: #40484a; }
+  color: #40484a;
+  font-family: 'Open Sans', sans-serif; }
+
+strong {
+  font-weight: 700; }
 
 .site {
   margin: 30px; }
@@ -1555,20 +1567,18 @@ h1, h2, h3, h4, h5, h6 {
 .logs {
   margin-left: 0;
   padding-left: 0;
-  border: 1px solid #ccc;
+  border: 1px solid #e4e7d0;
   background: #fff;
-  font-size: 13px; }
+  font-size: 13px;
+  border-radius: 2px; }
 
 .log-item {
   list-style: none;
   padding: 5px 9px;
-  border-top: 1px solid #ccc; }
+  border-top: 1px solid #e4e7d0; }
 
 .log-item:first-child {
   border-top: none; }
 
 .center-content {
   text-align: center; }
-
-.remove {
-  display: inline-block; }

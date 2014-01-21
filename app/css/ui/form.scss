@@ -25,7 +25,7 @@
 }
 .form-control:focus {
   background: #fff;
-  border-color: darken($bg_color, 30%);
+  border-color: desaturate(darken($bg_color, 30%), 15%);
   @include placeholder {
     color: darken($bg_color, 20%);
   }

@@ -11,6 +11,7 @@
   <script src="js/services.js"></script>
   <script src="js/controllers.js"></script>
 
+  <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" href="css/vendor/normalize.css" type="text/css">
   <link rel="stylesheet" href="css/marto.css" type="text/css">
 </head>
@@ -29,11 +30,22 @@
     <div class="main">
       <div ng-view></div>
     </div>
-    <div class="aside">
-      <ul class="logs">
-        <li class="log-item" ng-repeat="log in logs">{{ log.type }}</li>
-      </ul>
-    </div>
   </div>
+  <!--
+  <script type="text/javascript">
+    WebFontConfig = {
+      google: { families: [ 'Open+Sans:400,300,700:latin' ] }
+    };
+    (function() {
+      var wf = document.createElement('script');
+      wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+          '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+      wf.type = 'text/javascript';
+      wf.async = 'true';
+      var s = document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(wf, s);
+    })();
+  </script>
+  -->
 </body>
 </html>

@@ -27,7 +27,7 @@
       </li>
     </ul>
 
-    <h3>Requests <span class="button" ng-click="addRequest()">add request</span></h3>
+    <h3>Requests <span class="button button--small button--validate" ng-click="addRequest()"><i class="fa fa-plus"></i> add request</span></h3>
     <ul class="requests">
       <li class="request-item" ng-repeat="request in scenario.requests">
         <select ng-model="request.method" required ng-options="method.method for method in httpMethods">

@@ -2,4 +2,8 @@
 
 <div class="main-content">
   <span class="button" ng-click="run(scenario)">run now!</span>
+
+  <ul class="logs">
+    <li class="log-item" ng-repeat="log in logs">{{ log.type }}: {{ log.message }}</li>
+  </ul>
 </div>

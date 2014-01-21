@@ -25,6 +25,10 @@ $error_color:  #ff6343;
 body {
   background: $ground_color;
   color: $font_color;
+  font-family: 'Open Sans', sans-serif;
+}
+strong {
+  font-weight: 700;
 }
 .site {
   margin: 30px;
@@ -83,14 +87,15 @@ h1, h2, h3, h4, h5, h6 {
 .logs {
   margin-left: 0;
   padding-left: 0;
-  border: 1px solid #ccc;
+  border: 1px solid desaturate(darken($bg_color, 10%), 7%);
   background: #fff;
   font-size: 13px;
+  border-radius: 2px;
 }
 .log-item {
   list-style: none;
   padding: 5px 9px;
-  border-top: 1px solid #ccc;
+  border-top: 1px solid desaturate(darken($bg_color, 10%), 7%);
 }
 .log-item:first-child {
   border-top: none;
@@ -98,8 +103,4 @@ h1, h2, h3, h4, h5, h6 {
 
 .center-content {
   text-align: center;
-}
-
-.remove {
-  display: inline-block;
 }

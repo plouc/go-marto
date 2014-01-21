@@ -52,6 +52,7 @@
   }
 }
 
+.button--validate { @include button-color($action_color, $bg_color);  }
 .button--cancel { @include button-color($cancel_color, $bg_color); }
 .button--cancel:disabled {
   background: #000 !important;

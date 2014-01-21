@@ -173,7 +173,10 @@ angular.module('martoApp.controllers', []).
        $scope.logs.push({ type: event.type });
      });
      Marto.on("response.finished", function(event) {
-       $scope.logs.push({ type: event.type });
+       $scope.logs.push({
+         type: event.type,
+         message: event.body.method.toUpperCase() + " " + event.body.url
+       });
      });
 
      $scope.cancel = function() {
